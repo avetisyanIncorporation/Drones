@@ -7,7 +7,7 @@ Database - PostgreSQL, Migrations - Liquibase
 
 
 ## Environment
-For building, runing and testing the application you must to have:
+For building, running and testing the application you must have:
 
 0) Git
 1) Java 17 (in project)
@@ -15,7 +15,7 @@ For building, runing and testing the application you must to have:
 3) PostgreSQL 13 (in project)
 4) Docker (Optional) - for running in container
 
-P.s. Autobuild (CI/CD) will be soon (You should have only Docker (4))
+P.s. Auto build (CI/CD) will be soon (You should have only Docker (4))
 
 ### For self-build
 1) Clone the project (```git clone https://github.com/avetisyanIncorporation/Drones.git```)
