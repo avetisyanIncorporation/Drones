@@ -3,7 +3,8 @@
 ## Database Design 
 Database - PostgreSQL, Migrations - Liquibase
 
-![db_visual](https://user-images.githubusercontent.com/29467133/233854017-7196c1d1-0433-4183-a164-b32897a22bcb.PNG)
+![drones_db](https://user-images.githubusercontent.com/29467133/233858496-c1d3fff9-1e80-4114-9476-affee63b4d32.png)
+
 
 ## Environment
 For building, runing and testing the application you must to have:
