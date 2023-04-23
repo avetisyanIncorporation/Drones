@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="create-drone_model-table" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="drone_model"/>
+            </not>
+        </preConditions>
+        <createTable tableName="drone_model">
+            <column name="ID" type="smallint">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="NAME" type="varchar(15)" />
+            <column name="DESCRIPTION" type="varchar(50)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="insert-drone_model-data" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="drone_model"/>
+                <sqlCheck expectedResult="0">SELECT count(*) FROM drone_model</sqlCheck>
+            </and>
+        </preConditions>
+        <insert tableName="drone_model">
+            <column name="id" value="1"/>
+            <column name="name" value="LIGHTWEIGHT"/>
+            <column name="description" value="Lightweight model"/>
+        </insert>
+        <insert tableName="drone_model">
+            <column name="id" value="2"/>
+            <column name="name" value="MIDDLEWEIGHT"/>
+            <column name="description" value="Middleweight model"/>
+        </insert>
+        <insert tableName="drone_model">
+            <column name="id" value="3"/>
+            <column name="name" value="CRUISERWEIGHT"/>
+            <column name="description" value="Cruiserweight model"/>
+        </insert>
+        <insert tableName="drone_model">
+            <column name="id" value="4"/>
+            <column name="name" value="HEAVYWEIGHT"/>
+            <column name="description" value="Heavyweight model"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="create-drone_state-table" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="drone_state"/>
+            </not>
+        </preConditions>
+        <createTable tableName="drone_state">
+            <column name="ID" type="smallint">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="NAME" type="varchar(15)" />
+            <column name="DESCRIPTION" type="varchar(50)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="insert-drone_state-data" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="drone_state"/>
+                <sqlCheck expectedResult="0">SELECT count(*) FROM drone_state</sqlCheck>
+            </and>
+        </preConditions>
+        <insert tableName="drone_state">
+            <column name="id" value="1"/>
+            <column name="name" value="IDLE"/>
+            <column name="description" value="Ready to delivery"/>
+        </insert>
+        <insert tableName="drone_state">
+            <column name="id" value="2"/>
+            <column name="name" value="LOADING"/>
+            <column name="description" value="Drone loading"/>
+        </insert>
+        <insert tableName="drone_state">
+            <column name="id" value="3"/>
+            <column name="name" value="LOADED"/>
+            <column name="description" value="Drone loaded"/>
+        </insert>
+        <insert tableName="drone_state">
+            <column name="id" value="4"/>
+            <column name="name" value="DELIVERING"/>
+            <column name="description" value="Drone delivering"/>
+        </insert>
+        <insert tableName="drone_state">
+            <column name="id" value="5"/>
+            <column name="name" value="DELIVERED"/>
+            <column name="description" value="Drone delivered"/>
+        </insert>
+        <insert tableName="drone_state">
+            <column name="id" value="6"/>
+            <column name="name" value="RETURNING"/>
+            <column name="description" value="Drone returning"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="create-drone-table" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="drone"/>
+            </not>
+        </preConditions>
+        <createTable tableName="drone">
+            <column autoIncrement="true" name="ID" type="bigint">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="serial_number" type="varchar(100)">
+                <constraints nullable="false" unique="true" />
+            </column>
+            <column name="model_id" type="smallint" >
+                <constraints nullable="false" foreignKeyName="fk_drone_model_id" references="DRONE_MODEL(ID)"/>
+            </column>
+            <column name="state_id" type="smallint" >
+                <constraints nullable="false" foreignKeyName="fk_drone_state_id" references="DRONE_STATE(ID)"/>
+            </column>
+            <column name="weight_limit" type="smallint" remarks="gram">
+                <constraints nullable="false" />
+            </column>
+            <column name="battery_capacity" type="smallint" remarks="percentage">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-drone_id_seq-sequence" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="drone_id_seq"/>
+            </not>
+        </preConditions>
+        <sql>
+            create sequence if not exists drone_id_seq as bigint
+                increment by 1
+                start with 1;
+        </sql>
+    </changeSet>
+
+    <changeSet id="create-drone_state_id_idx-index" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="drone_state_id_idx"/>
+            </not>
+        </preConditions>
+        <sql>
+            create index drone_state_id_idx on drone(state_id);
+        </sql>
+    </changeSet>
+
+    <changeSet id="alter-drone-add-weight_limit-max-value" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <columnExists tableName="drone" columnName="weight_limit"/>
+                <sqlCheck expectedResult="0">SELECT count(*) FROM pg_constraint where
+                    UPPER(conname)='CHECK_DRONE_WEIGHT_LIMIT'
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <sql>
+            ALTER TABLE drone ADD CONSTRAINT check_drone_weight_limit CHECK (weight_limit BETWEEN 0 AND 500);
+        </sql>
+    </changeSet>
+
+    <changeSet id="alter-drone-add-battery_capacity-max-value" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <columnExists tableName="drone" columnName="battery_capacity"/>
+                <sqlCheck expectedResult="0">SELECT count(*) FROM pg_constraint where
+                    UPPER(conname)='CHECK_DRONE_BATTERY_CAPACITY'
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <sql>
+            ALTER TABLE drone ADD CONSTRAINT check_drone_battery_capacity CHECK (battery_capacity BETWEEN 0 AND 100);
+        </sql>
+    </changeSet>
+
+    <changeSet id="create-medication-table" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="medication"/>
+            </not>
+        </preConditions>
+        <createTable tableName="medication">
+            <column autoIncrement="true" name="ID" type="bigint">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false" />
+            </column>
+            <column name="weight" type="smallint" remarks="gram">
+                <constraints nullable="false" />
+            </column>
+            <column name="code" type="varchar(100)" >
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="image" type="bytea" />
+            <column name="drone_id" type="bigint" >
+                <constraints foreignKeyName="fk_medicament_to_drone" references="DRONE(ID)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-medication_id_seq-sequence" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="medication_id_seq"/>
+            </not>
+        </preConditions>
+        <sql>
+            create sequence if not exists medication_id_seq as bigint
+                increment by 1
+                start with 1;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

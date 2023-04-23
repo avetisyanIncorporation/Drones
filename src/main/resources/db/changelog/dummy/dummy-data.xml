@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="add-drone-dummy-data" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM drone</sqlCheck>
+        </preConditions>
+        <sql>
+            insert into drone (serial_number, model_id, state_id, weight_limit, battery_capacity)
+            values
+                ('aa11bb11', 1, 1, 200, 75), -- should be available, but have no medications
+                ('aa11bb22', 2, 2, 250, 50), -- should be available
+                ('aa22bb11', 3, 3, 300, 0),
+                ('aa22bb22', 4, 5, 500, 30),
+                ('bb11cc11', 1, 1, 250, 75), -- should be available, but have no medications
+                ('bb11cc22', 1, 1, 250, 20), -- available, but can't fly (battery less 25%)
+                ('bb22cc11', 2, 2, 300, 20), -- available, but can't fly (battery less 25%)
+                ('bb22cc22', 2, 3, 300, 20),
+                ('cc11dd11', 4, 1, 500, 99), -- should be available, but have no medications
+                ('cc11dd22', 3, 1, 400, 24), -- available, but can't fly (battery less 25%)
+                ('cc22dd11', 2, 2, 300, 70), -- should be available
+                ('cc22dd22', 3, 2, 400, 50); -- should be available
+        </sql>
+    </changeSet>
+
+    <changeSet id="add-medication-dummy-data" author="pargev">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">SELECT count(*) FROM medication</sqlCheck>
+        </preConditions>
+        <sql>
+            insert into medication (name, weight, code, drone_id)
+            values
+                ('drugType1', 50, 'aa11', 2),
+                ('drugType2', 100, 'aa22', 11),
+                ('drugType1', 50, 'bb11', 11),
+                ('drugType2', 100, 'bb22', 12),
+                ('drugType3', 150, 'bb33', 12);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
