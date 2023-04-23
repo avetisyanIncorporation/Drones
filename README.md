@@ -46,7 +46,7 @@ P.s. Soon
 1) For register a new drone use ```/drone/register/```
    with params: ```serialNumber, modelId, stateId, weightLimit, batteryCapacity```
 2) For create new medication use ```/medication/create/```
-   with params: ```name, weight, code, image, droneId```
+   with params: ```name, weight, code, image (non-required), droneId (for add to current drone, non-required)```
 3) For add medication to current drone use ```/drone/{droneId}/addMedication/{medicationId}/```
    , where ```droneId``` is ```drone.id from db``` and ```medicationId``` is ```medication.id from db```
   
