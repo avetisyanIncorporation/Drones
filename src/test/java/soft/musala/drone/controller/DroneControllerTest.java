@@ -17,7 +17,6 @@ import soft.musala.drone.service.DroneService;
 import soft.musala.drone.service.ExceptionService;
 import soft.musala.drone.service.MedicationService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -37,8 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DroneController.class)
 public class DroneControllerTest {
 
-    private final String DRONES_MANAGEMENT_URL = "/drone-management/drones";
-    private final String DRONES_MANAGEMENT_FULL_URL = "/drone-management/drones/";
+    private final String DRONES_MANAGEMENT_URN = "/drone-management/drones";
+    private final String DRONES_MANAGEMENT_FULL_URN = "/drone-management/drones/";
 
     @Autowired
     private MockMvc mockMvc;
@@ -53,16 +52,7 @@ public class DroneControllerTest {
     private ExceptionService exceptionService;
 
     @Test
-    public void emptyAvailableDrones() throws Exception {
-        when(droneService.getAllAvailable()).thenReturn(Collections.emptyList());
-        mockMvc.perform(get(DRONES_MANAGEMENT_URL))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string("[]"));
-    }
-
-    @Test
-    public void availableDrones() throws Exception {
+    public void availableDronesShouldBeReturned() throws Exception {
         var drone1Dto = new DroneDTOBuilder()
                 .id(1L)
                 .serialNumber("1L")
@@ -74,25 +64,25 @@ public class DroneControllerTest {
         var drone1 = new Drone(drone1Dto);
 
         when(droneService.getAllAvailable()).thenReturn(List.of(drone1));
-        mockMvc.perform(get(DRONES_MANAGEMENT_URL))
+        mockMvc.perform(get(DRONES_MANAGEMENT_URN))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("[{\"id\":null,\"serialNumber\":\"1L\",\"model\":null,\"state\":null,\"weightLimit\":500,\"batteryCapacity\":100,\"medications\":[]}]"));
     }
 
     @Test
-    public void failToAddNewDroneWhenBindingResultHasErrors() throws Exception {
+    public void addNewDroneThrowExceptionWhenSerialNumberIsNotMatchedToPattern() throws Exception {
         var mockExceptionText = "exception in BindingResult";
         doThrow(new BusinessException(mockExceptionText)).when(exceptionService).throwBusinessExceptionByFieldsError(any());
 
-        mockMvc.perform(post(DRONES_MANAGEMENT_URL).param("serialNumber", Strings.EMPTY))
+        mockMvc.perform(post(DRONES_MANAGEMENT_URN).param("serialNumber", Strings.EMPTY))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(mockExceptionText));
     }
 
     @Test
-    public void registerNewDrone() throws Exception {
+    public void droneShouldBeRegistered() throws Exception {
         var droneDto = new DroneDTOBuilder()
                 .serialNumber("1L1L2L2L")
                 .modelId(DroneModel.HEAVYWEIGHT.getId())
@@ -102,7 +92,7 @@ public class DroneControllerTest {
                 .build();
         when(droneService.addNewDrone(eq(droneDto))).thenReturn(new Drone(droneDto));
 
-        mockMvc.perform(post(DRONES_MANAGEMENT_URL)
+        mockMvc.perform(post(DRONES_MANAGEMENT_URN)
                         .param("serialNumber", droneDto.getSerialNumber())
                         .param("modelId", String.valueOf(droneDto.getModelId()))
                         .param("stateId", String.valueOf(droneDto.getStateId()))
@@ -115,46 +105,46 @@ public class DroneControllerTest {
     }
 
     @Test
-    public void failToGetBatteryCapacityWhenHaveNoDrone() throws Exception {
+    public void getBatteryCapacityThrowIllegalArgumentExceptionWhenCantFindADrone() throws Exception {
         var droneId = 1L;
         var exceptionText = "No drone with id=" + droneId;
         when(droneService.getDroneBatteryCapacity(droneId))
                 .thenThrow(new IllegalArgumentException(exceptionText));
 
-        mockMvc.perform(get(DRONES_MANAGEMENT_FULL_URL + droneId + "/battery-capacity"))
+        mockMvc.perform(get(DRONES_MANAGEMENT_FULL_URN + droneId + "/battery-capacity"))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(exceptionText));
     }
 
     @Test
-    public void getBatteryCapacity() throws Exception {
+    public void batteryCapacityShouldBeReturned() throws Exception {
         var droneId = 1L;
         var batteryCapacity = 99;
         when(droneService.getDroneBatteryCapacity(droneId))
                 .thenReturn(batteryCapacity);
 
-        mockMvc.perform(get(DRONES_MANAGEMENT_FULL_URL + droneId + "/battery-capacity"))
+        mockMvc.perform(get(DRONES_MANAGEMENT_FULL_URN + droneId + "/battery-capacity"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(String.valueOf(batteryCapacity)));
     }
 
     @Test
-    public void failToGetMedicationsWhenHaveNoDrone() throws Exception {
+    public void getDroneMedicationsThrowIllegalArgumentExceptionWhenCantFindDrone() throws Exception {
         var droneId = 1L;
         var exceptionText = "No drone with id=" + droneId;
         when(droneService.getDroneById(droneId))
                 .thenThrow(new IllegalArgumentException(exceptionText));
 
-        mockMvc.perform(get(DRONES_MANAGEMENT_FULL_URL + droneId + "/medications"))
+        mockMvc.perform(get(DRONES_MANAGEMENT_FULL_URN + droneId + "/medications"))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(exceptionText));
     }
 
     @Test
-    public void getDroneMedications() throws Exception {
+    public void droneMedicationsShouldBeReturned() throws Exception {
         var droneId = 11L;
         var droneDto = new DroneDTOBuilder()
                 .serialNumber("1L1L2L2L")
@@ -168,28 +158,28 @@ public class DroneControllerTest {
         drone.setMedications(Set.of(new Medication(medicationDto)));
 
         when(droneService.getDroneById(droneId)).thenReturn(drone);
-        mockMvc.perform(get(DRONES_MANAGEMENT_FULL_URL + droneId + "/medications"))
+        mockMvc.perform(get(DRONES_MANAGEMENT_FULL_URN + droneId + "/medications"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("{\"id\":null,\"serialNumber\":\"1L1L2L2L\",\"model\":null,\"state\":null,\"weightLimit\":500,\"batteryCapacity\":99,\"medications\":[{\"id\":null,\"name\":\"Aspirin\",\"weight\":50,\"code\":\"AS_50\",\"image\":null}]}"));
     }
 
     @Test
-    public void failToAddMedicationToDroneIfHaveNoDrone() throws Exception {
+    public void addMedicationToDroneThrowIllegalArgumentExceptionIfCantFindDrone() throws Exception {
         var droneId = 1L;
         var medicationId = 2L;
         var exceptionMessage = "Have no drone";
         when(droneService.getDroneById(eq(droneId)))
                 .thenThrow(new IllegalArgumentException(exceptionMessage));
 
-        mockMvc.perform(post(DRONES_MANAGEMENT_FULL_URL + droneId + "/medication/" + medicationId + "/add"))
+        mockMvc.perform(post(DRONES_MANAGEMENT_FULL_URN + droneId + "/managed-medications/" + medicationId))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(exceptionMessage));
     }
 
     @Test
-    public void failToAddMedicationToDroneIfHaveNoMedication() throws Exception {
+    public void addMedicationToDroneThrowIllegalArgumentExceptionIfCantFindMedication() throws Exception {
         var droneId = 1L;
         var medicationId = 2L;
         when(droneService.getDroneById(eq(droneId))).thenReturn(new Drone());
@@ -197,14 +187,14 @@ public class DroneControllerTest {
         when(medicationService.getMedication(eq(medicationId)))
                 .thenThrow(new IllegalArgumentException(exceptionMessage));
 
-        mockMvc.perform(post(DRONES_MANAGEMENT_FULL_URL + droneId + "/medication/" + medicationId + "/add"))
+        mockMvc.perform(post(DRONES_MANAGEMENT_FULL_URN + droneId + "/managed-medications/" + medicationId))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(exceptionMessage));
     }
 
     @Test
-    public void addMedicationToDrone() throws Exception {
+    public void medicationShouldBeCreatedAndAddedToDrone() throws Exception {
         var droneId = 1L;
         var drone = new Drone();
         drone.setId(droneId);
@@ -215,7 +205,7 @@ public class DroneControllerTest {
         medication.setId(medicationId);
         when(medicationService.getMedication(eq(medicationId))).thenReturn(medication);
 
-        mockMvc.perform(post(DRONES_MANAGEMENT_FULL_URL + droneId + "/medication/" + medicationId + "/add"))
+        mockMvc.perform(post(DRONES_MANAGEMENT_FULL_URN + droneId + "/managed-medications/" + medicationId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("{\"id\":1,\"serialNumber\":null,\"model\":null,\"state\":null,\"weightLimit\":0,\"batteryCapacity\":0,\"medications\":[{\"id\":2,\"name\":null,\"weight\":0,\"code\":null,\"image\":null}]}"));

@@ -20,6 +20,7 @@
     <properties>
         <java.version>17</java.version>
         <hibernate-validator.version>8.0.0.Final</hibernate-validator.version>
+        <h2-database.version>2.1.214</h2-database.version>
     </properties>
 
     <dependencies>
@@ -45,6 +46,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2-database.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.validator</groupId>

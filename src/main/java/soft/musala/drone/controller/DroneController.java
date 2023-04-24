@@ -62,7 +62,7 @@ public class DroneController {
     }
 
     @Transactional
-    @PostMapping(value = "/{drone-id}/medication/{medication-id}/add")
+    @PostMapping(value = "/{drone-id}/managed-medications/{medication-id}")
     public Drone addMedicationToDrone(@PathVariable("drone-id") Long droneId,
                                       @PathVariable("medication-id") Long medicationId) {
         var drone = droneService.getDroneById(droneId);

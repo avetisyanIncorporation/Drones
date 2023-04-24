@@ -19,7 +19,7 @@ class DefaultControllerAdviceTest {
     private DefaultControllerAdvice defaultControllerAdvice;
 
     @Test
-    void handleBusinessException() {
+    void businessExceptionShouldBeHandled() {
         String message = "business exception test";
         var be = new BusinessException(message);
         var result = defaultControllerAdvice.handleBusinessException(be);
@@ -28,7 +28,7 @@ class DefaultControllerAdviceTest {
     }
 
     @Test
-    void handleIllegalArgumentException() {
+    void illegalArgumentExceptionShouldBeHandled() {
         String message = "illegal argument test";
         var iae = new IllegalArgumentException(message);
         var result = defaultControllerAdvice.handleIllegalArgumentException(iae);

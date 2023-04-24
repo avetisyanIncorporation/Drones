@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(MedicationController.class)
 public class MedicationControllerTest {
 
-    private final String MEDICATIONS_MANAGEMENT_URL = "/medication-management/medications";
+    private final String MEDICATIONS_MANAGEMENT_URN = "/medication-management/medications";
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,7 +43,7 @@ public class MedicationControllerTest {
         var mockExceptionText = "exception in BindingResult";
         doThrow(new BusinessException(mockExceptionText)).when(exceptionService).throwBusinessExceptionByFieldsError(any());
 
-        mockMvc.perform(post(MEDICATIONS_MANAGEMENT_URL).param("name", Strings.EMPTY))
+        mockMvc.perform(post(MEDICATIONS_MANAGEMENT_URN).param("name", Strings.EMPTY))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(mockExceptionText));
@@ -55,7 +55,7 @@ public class MedicationControllerTest {
         var medication = new Medication(medicationDto);
 
         when(medicationService.createMedication(eq(medicationDto))).thenReturn(medication);
-        mockMvc.perform(post(MEDICATIONS_MANAGEMENT_URL)
+        mockMvc.perform(post(MEDICATIONS_MANAGEMENT_URN)
                         .param("name", medicationDto.getName())
                         .param("weight", String.valueOf(medicationDto.getWeight()))
                         .param("code", medicationDto.getCode())
