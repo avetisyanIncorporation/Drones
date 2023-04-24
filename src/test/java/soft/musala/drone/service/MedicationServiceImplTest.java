@@ -37,14 +37,14 @@ class MedicationServiceImplTest {
     private MedicationServiceImpl medicationService;
 
     @Test
-    void getMedicationByDroneIdTest() {
+    void medicationByDroneId() {
         var droneId = 1L;
         medicationService.getMedicationByDroneId(droneId);
         verify(medicationRepository).findAllByDroneId(eq(droneId));
     }
 
     @Test
-    void createMedicationWithoutDroneTest() {
+    void medicationWithoutDroneCreating() {
         var medicationDto = new MedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, null);
         var medicationCaptor = ArgumentCaptor.forClass(Medication.class);
         medicationService.createMedication(medicationDto);
@@ -58,18 +58,23 @@ class MedicationServiceImplTest {
     }
 
     @Test
-    void createMedicationWithDroneTest() {
+    void failToCreateMedicationIfDroneIsNotAvailable() {
         var droneId = 2L;
         var medicationDto = new MedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, droneId);
         var drone = mock(Drone.class);
         when(droneService.getDroneById(droneId)).thenReturn(drone);
-        // Drone is not available
         when(droneService.isAvailableForLoading(eq(drone), eq(medicationDto.getWeight()))).thenReturn(false);
         TestUtils.checkException(
                 () -> medicationService.createMedication(medicationDto),
                 new IllegalArgumentException("Can't loading drone: " + drone));
+    }
 
-        // Drone is available
+    @Test
+    void createMedication() {
+        var droneId = 2L;
+        var medicationDto = new MedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, droneId);
+        var drone = mock(Drone.class);
+        when(droneService.getDroneById(droneId)).thenReturn(drone);
         when(droneService.isAvailableForLoading(eq(drone), eq(medicationDto.getWeight()))).thenReturn(true);
         var medicationCaptor = ArgumentCaptor.forClass(Medication.class);
         medicationService.createMedication(medicationDto);
@@ -85,16 +90,20 @@ class MedicationServiceImplTest {
     }
 
     @Test
-    void getMedicationTest() {
+    void failToGetMedicationIfHaveNoInDB() {
         var medicationId = 3L;
-        var medication = mock(Medication.class);
-        // empty throws exception
         when(medicationRepository.findById(medicationId)).thenReturn(Optional.empty());
         TestUtils.checkException(
                 () -> medicationService.getMedication(medicationId),
                 new IllegalArgumentException("No Medication with id=" + medicationId)
         );
-        // all right
+
+    }
+
+    @Test
+    void getMedication() {
+        var medicationId = 3L;
+        var medication = mock(Medication.class);
         when(medicationRepository.findById(medicationId)).thenReturn(Optional.of(medication));
         var result = medicationService.getMedication(medicationId);
         assertEquals(medication, result);

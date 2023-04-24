@@ -1,7 +1,6 @@
 package soft.musala.drone.service;
 
 import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import soft.musala.drone.domain.dto.DroneDTO;
 import soft.musala.drone.domain.entity.Drone;
@@ -21,7 +20,6 @@ public class DroneServiceImpl implements DroneService {
 
     private final DroneRepository droneRepository;
 
-    @Autowired
     public DroneServiceImpl(DroneRepository droneRepository) {
         this.droneRepository = droneRepository;
     }

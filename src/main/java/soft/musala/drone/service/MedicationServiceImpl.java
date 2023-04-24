@@ -1,6 +1,5 @@
 package soft.musala.drone.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import soft.musala.drone.domain.dto.MedicationDTO;
@@ -10,7 +9,6 @@ import soft.musala.drone.domain.repository.MedicationRepository;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * @author Pargev A. created on 13.04.2023
@@ -20,15 +18,10 @@ public class MedicationServiceImpl implements MedicationService {
 
     private final DroneService droneService;
     private final MedicationRepository medicationRepository;
-    private final Pattern MEDICATION_NAME_PATTERN;
-    private final Pattern MEDICATION_CODE_PATTERN;
 
-    @Autowired
     public MedicationServiceImpl(DroneService droneService, MedicationRepository medicationRepository) {
         this.droneService = droneService;
         this.medicationRepository = medicationRepository;
-        this.MEDICATION_NAME_PATTERN = Pattern.compile("[a-zA-Z1-9-_]+");
-        this.MEDICATION_CODE_PATTERN = Pattern.compile("[A-Z1-9_]+");
     }
 
     @Override

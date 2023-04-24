@@ -12,12 +12,9 @@ import soft.musala.drone.exception.BusinessException;
 import soft.musala.drone.service.ExceptionService;
 import soft.musala.drone.service.MedicationService;
 
-import java.util.Arrays;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(MedicationController.class)
 public class MedicationControllerTest {
 
+    private final String MEDICATIONS_MANAGEMENT_URL = "/medication-management/medications";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,31 +39,30 @@ public class MedicationControllerTest {
     private ExceptionService exceptionService;
 
     @Test
-    public void createMedicationFailureTest() throws Exception {
+    public void failCreatingMedicationWhenFieldNameIsNotMatchToPattern() throws Exception {
         var mockExceptionText = "exception in BindingResult";
         doThrow(new BusinessException(mockExceptionText)).when(exceptionService).throwBusinessExceptionByFieldsError(any());
 
-        mockMvc.perform(post("/medication/create").param("name", Strings.EMPTY))
+        mockMvc.perform(post(MEDICATIONS_MANAGEMENT_URL).param("name", Strings.EMPTY))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(mockExceptionText));
     }
 
     @Test
-    public void createMedicationSuccessTest() throws Exception {
-        var medicationDto = new MedicationDTO("Aspirine", 50, "AS50", null, 3L);
-        when(medicationService.createMedication(eq(medicationDto))).thenReturn(mock(Medication.class));
+    public void createMedication() throws Exception {
+        var medicationDto = new MedicationDTO("Aspirine", 50, "AS", null, 3L);
+        var medication = new Medication(medicationDto);
 
-        mockMvc.perform(post("/medication/create")
+        when(medicationService.createMedication(eq(medicationDto))).thenReturn(medication);
+        mockMvc.perform(post(MEDICATIONS_MANAGEMENT_URL)
                         .param("name", medicationDto.getName())
                         .param("weight", String.valueOf(medicationDto.getWeight()))
                         .param("code", medicationDto.getCode())
-                        .param("image", Arrays.toString(medicationDto.getImage()))
                         .param("droneId", String.valueOf(medicationDto.getDroneId()))
                 )
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(Strings.EMPTY))
-        ;
+                .andExpect(content().string("{\"id\":null,\"name\":\"Aspirine\",\"weight\":50,\"code\":\"AS\",\"image\":null}"));
     }
 }

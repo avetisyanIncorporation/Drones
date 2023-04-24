@@ -1,7 +1,6 @@
 package soft.musala.drone.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,20 +15,19 @@ import soft.musala.drone.service.MedicationService;
  * @author Pargev A. created on 14.04.2023
  */
 @RestController
-@RequestMapping(value = "medication")
+@RequestMapping(value = "medication-management/medications")
 public class MedicationController {
 
     private final MedicationService medicationService;
     private final ExceptionService exceptionService;
 
-    @Autowired
     public MedicationController(MedicationService medicationService,
                                 ExceptionService exceptionService) {
         this.medicationService = medicationService;
         this.exceptionService = exceptionService;
     }
 
-    @PostMapping(value = "/create")
+    @PostMapping
     public Medication createMedication(@Valid @ModelAttribute MedicationDTO medicationDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             exceptionService.throwBusinessExceptionByFieldsError(bindingResult);

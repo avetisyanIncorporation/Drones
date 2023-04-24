@@ -1,7 +1,6 @@
 package soft.musala.drone.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,14 +23,13 @@ import java.util.List;
  * @author Pargev A. created on 13.04.2023
  */
 @RestController
-@RequestMapping(value = "drone")
+@RequestMapping(value = "drone-management/drones")
 public class DroneController {
 
     private final DroneService droneService;
     private final MedicationService medicationService;
     private final ExceptionService exceptionService;
 
-    @Autowired
     public DroneController(DroneService droneService,
                            MedicationService medicationService,
                            ExceptionService exceptionService) {
@@ -40,7 +38,12 @@ public class DroneController {
         this.exceptionService = exceptionService;
     }
 
-    @PostMapping(value = "register")
+    @GetMapping
+    public List<Drone> getAvailable() {
+        return droneService.getAllAvailable();
+    }
+
+    @PostMapping
     public Drone registerNewDrone(@Valid @ModelAttribute DroneDTO droneDTO, BindingResult result) {
         if (result.hasErrors()) {
             exceptionService.throwBusinessExceptionByFieldsError(result);
@@ -48,24 +51,20 @@ public class DroneController {
         return droneService.addNewDrone(droneDTO);
     }
 
-    @GetMapping(value = "getAvailable")
-    public List<Drone> getAllAvailable() {
-        return droneService.getAllAvailable();
-    }
-
-    @GetMapping(value = "/{droneId}/getBatteryCapacity")
-    public Integer getDroneBatteryCapacity(@PathVariable Long droneId) {
+    @GetMapping(value = "/{drone-id}/battery-capacity")
+    public Integer getDroneBatteryCapacity(@PathVariable("drone-id") Long droneId) {
         return droneService.getDroneBatteryCapacity(droneId);
     }
 
-    @GetMapping(value = "/{droneId}/getMedications")
-    public Drone getDroneMedications(@PathVariable Long droneId) {
+    @GetMapping(value = "/{drone-id}/medications")
+    public Drone getDroneMedications(@PathVariable("drone-id") Long droneId) {
         return droneService.getDroneById(droneId);
     }
 
     @Transactional
-    @PostMapping(value = "/{droneId}/addMedication/{medicationId}")
-    public Drone addMedicationToDrone(@PathVariable Long droneId, @PathVariable Long medicationId) {
+    @PostMapping(value = "/{drone-id}/medication/{medication-id}/add")
+    public Drone addMedicationToDrone(@PathVariable("drone-id") Long droneId,
+                                      @PathVariable("medication-id") Long medicationId) {
         var drone = droneService.getDroneById(droneId);
         var medication = medicationService.getMedication(medicationId);
         drone.getMedications().add(medication);

@@ -19,22 +19,29 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import soft.musala.drone.domain.dto.DroneDTO;
 import soft.musala.drone.domain.enumeration.DroneModel;
 import soft.musala.drone.domain.enumeration.DroneState;
 
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 
-import static soft.musala.drone.domain.constant.Constants.*;
+import static soft.musala.drone.domain.constant.Constants.DRONE_MAX_BATTERY_CAPACITY;
+import static soft.musala.drone.domain.constant.Constants.DRONE_MAX_WEIGHT_LIMIT;
+import static soft.musala.drone.domain.constant.Constants.DRONE_MIN_BATTERY_CAPACITY;
+import static soft.musala.drone.domain.constant.Constants.DRONE_MIN_WEIGHT_LIMIT;
+import static soft.musala.drone.domain.constant.Constants.DRONE_SERIAL_NUMBER_MAX_LENGTH;
+import static soft.musala.drone.domain.constant.Constants.DRONE_SERIAL_NUMBER_MIN_LENGTH;
 
 /**
  * @author Pargev A. created on 13.04.2023
  */
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "drone")
 public class Drone {
@@ -90,6 +97,13 @@ public class Drone {
         this.batteryCapacity = droneDTO.getBatteryCapacity();
     }
 
+    public Set<Medication> getMedications() {
+        if (medications == null) {
+            medications = new HashSet<>();
+        }
+        return medications;
+    }
+
     @PostLoad
     void fillTransients() {
         if (modelId > 0) {
@@ -112,19 +126,6 @@ public class Drone {
         } else if (stateId > 0) {
             this.state = DroneState.valueOf(stateId);
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Drone drone = (Drone) o;
-        return Objects.equals(id, drone.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 
     @Override

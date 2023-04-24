@@ -40,7 +40,13 @@ class DroneServiceImplTest {
     private DroneServiceImpl droneService;
 
     @Test
-    void getAllAvailableTest() {
+    void allDrones() {
+        droneService.getAllDrones();
+        verify(droneRepository, times(1)).findAll();
+    }
+
+    @Test
+    void allAvailableDrones() {
         droneService.getAllAvailable();
         verify(droneRepository, times(1)).findAllByStateIdInAndBatteryCapacityGreaterThan(
                 eq(List.of(DroneState.IDLE.getId(), DroneState.LOADING.getId())),
@@ -49,7 +55,7 @@ class DroneServiceImplTest {
     }
 
     @Test
-    void addDroneTest() {
+    void newDrone() {
         var droneDTO = new DroneDTOBuilder()
                 .serialNumber("aabb1122")
                 .modelId(2)
@@ -71,7 +77,7 @@ class DroneServiceImplTest {
     }
 
     @Test
-    void getDroneBatteryCapacitySuccessTest() {
+    void batteryCapacity() {
         long droneId = 1;
         var battery_percentage = 30;
         var drone = mock(Drone.class);
@@ -84,7 +90,7 @@ class DroneServiceImplTest {
     }
 
     @Test
-    void getDroneBatteryCapacityFailureTest() {
+    void failToGetBatteryCapacityWhenHaveNoDrone() {
         long droneId = 2;
         when(droneRepository.findById(eq(droneId))).thenReturn(Optional.empty());
 
@@ -94,17 +100,24 @@ class DroneServiceImplTest {
     }
 
     @Test
-    void isDroneAvailableForLoadingTest() {
+    void isNotAvailableWhenWrongState() {
         var drone = mock(Drone.class);
-        var weight = 50;
-        // wrong state
         when(drone.getStateId()).thenReturn(DroneState.DELIVERED.getId());
-        assertFalse(droneService.isAvailableForLoading(drone, weight));
-        // wrong battery capacity
+        assertFalse(droneService.isAvailableForLoading(drone, 50));
+    }
+
+    @Test
+    void isNotAvailableIfBatteryCapacityLessThan() {
+        var drone = mock(Drone.class);
         when(drone.getStateId()).thenReturn(DroneState.LOADING.getId());
         when(drone.getBatteryCapacity()).thenReturn(AVAILABLE_DRONES_BATTERY_CAPACITY_PERCENTAGE - 5);
-        assertFalse(droneService.isAvailableForLoading(drone, weight));
-        // wrong weight
+        assertFalse(droneService.isAvailableForLoading(drone, 50));
+    }
+
+    @Test
+    void isNotAvailableIfWeightLimitExceeded() {
+        var drone = mock(Drone.class);
+        when(drone.getStateId()).thenReturn(DroneState.IDLE.getId());
         when(drone.getBatteryCapacity()).thenReturn(AVAILABLE_DRONES_BATTERY_CAPACITY_PERCENTAGE + 5);
         var medication50 = mock(Medication.class);
         when(medication50.getWeight()).thenReturn(50);
@@ -113,8 +126,14 @@ class DroneServiceImplTest {
         when(drone.getMedications()).thenReturn(Set.of(medication50, medication100));
         when(drone.getWeightLimit()).thenReturn(100);
         assertFalse(droneService.isAvailableForLoading(drone, 50));
-        // all right
+    }
+
+    @Test
+    void isAvailable() {
+        var drone = mock(Drone.class);
+        when(drone.getStateId()).thenReturn(DroneState.LOADING.getId());
+        when(drone.getBatteryCapacity()).thenReturn(AVAILABLE_DRONES_BATTERY_CAPACITY_PERCENTAGE + 5);
         when(drone.getWeightLimit()).thenReturn(200);
-        assertTrue(droneService.isAvailableForLoading(drone, weight));
+        assertTrue(droneService.isAvailableForLoading(drone, 50));
     }
 }

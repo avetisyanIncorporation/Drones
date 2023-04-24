@@ -13,17 +13,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import soft.musala.drone.domain.dto.MedicationDTO;
-
-import java.util.Objects;
 
 /**
  * @author Pargev A. created on 13.04.2023
  */
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
+@ToString(of = {"id", "name", "weight", "code"})
 @Entity
 @Table(name = "medication")
 public class Medication {
@@ -64,29 +66,5 @@ public class Medication {
         this.weight = medicationDTO.getWeight();
         this.code = medicationDTO.getCode();
         this.image = medicationDTO.getImage();
-        //
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Medication that = (Medication) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Medication{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", weight=" + weight +
-                ", code=" + code +
-                '}';
     }
 }

@@ -43,9 +43,14 @@ public class MedicationDTO {
     @Size(min = MEDICATION_CODE_MIN_LENGTH, max = MEDICATION_CODE_MAX_LENGTH)
     private String code;
 
-    @Nullable
     private byte[] image;
 
     @Nullable
     private Long droneId;
+
+    public MedicationDTO(String name, int weight, String code) {
+        this.name = name;
+        this.weight = weight;
+        this.code = code;
+    }
 }

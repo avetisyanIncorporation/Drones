@@ -27,7 +27,7 @@ class ExceptionServiceImplTest {
     private ExceptionServiceImpl exceptionService;
 
     @Test
-    void throwBusinessExceptionByFieldsSuccessTest() {
+    void fieldsBusinessExceptionThrowing() {
         var serialNumberFieldError = mock(FieldError.class);
         when(serialNumberFieldError.getField()).thenReturn("serialNumber");
         when(serialNumberFieldError.getDefaultMessage()).thenReturn("length might be <= 100");
@@ -50,7 +50,7 @@ class ExceptionServiceImplTest {
     }
 
     @Test
-    void throwBusinessExceptionByEmptyFieldsTest() {
+    void emptyFieldsBusinessExceptionThrowing() {
         var bindingResult = mock(BindingResult.class);
         when(bindingResult.getAllErrors()).thenReturn(Collections.emptyList());
 
