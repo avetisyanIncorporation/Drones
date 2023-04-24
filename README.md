@@ -38,16 +38,16 @@ P.s. Soon
 
 @GET
 
-1) For get all available drones use ```/drone/getAvailable/```
-2) For get current drone battery capacity use ```/drone/{droneId}/getBatteryCapacity/```, where ```droneId``` is ```drone.id from db```
-3) For get drone medications use ```/drone/{droneId}/getMedication/```, where ```droneId``` is ```drone.id from db```
+1) For get all available drones use ```/drone-management/drones```
+2) For get current drone battery capacity use ```/drone-management/drones/{drone-id}/battery-capacity/```, where ```drone-id``` is ```drone.id from db```
+3) For get drone medications use ```/drone-management/drones/{drone-id}/medications/```, where ```drone-id``` is ```drone.id from db```
 
 @POST
 
-1) For register a new drone use ```/drone/register/```
+1) For register a new drone use ```/drone-management/drones```
    with params: ```serialNumber, modelId, stateId, weightLimit, batteryCapacity```
-2) For create new medication use ```/medication/create/```
+2) For create new medication use ```/medication-management/medications```
    with params: ```name, weight, code, image (non-required), droneId (for add to current drone, non-required)```
-3) For add medication to current drone use ```/drone/{droneId}/addMedication/{medicationId}/```
-   , where ```droneId``` is ```drone.id from db``` and ```medicationId``` is ```medication.id from db```
+3) For add medication to current drone use ```/drone-management/drones/{drone-id}/medication/{medication-id}/add```
+   , where ```drone-id``` is ```drone.id from db``` and ```medication-id``` is ```medication.id from db```
   
