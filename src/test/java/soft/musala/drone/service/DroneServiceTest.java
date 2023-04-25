@@ -6,7 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import soft.musala.drone.builder.DroneDTOBuilder;
+import soft.musala.drone.builder.CreateDroneDTOBuilder;
 import soft.musala.drone.domain.entity.Drone;
 import soft.musala.drone.domain.entity.Medication;
 import soft.musala.drone.domain.enumeration.DroneState;
@@ -56,24 +56,24 @@ class DroneServiceTest {
 
     @Test
     void droneShouldBeCreated() {
-        var droneDTO = new DroneDTOBuilder()
+        var createDroneDTO = new CreateDroneDTOBuilder()
                 .serialNumber("aabb1122")
                 .modelId(2)
                 .stateId(2)
                 .weightLimit(400)
                 .batteryCapacity(99)
                 .build();
-        droneService.addNewDrone(droneDTO);
+        droneService.addNewDrone(createDroneDTO);
 
         var argumentCaptor = ArgumentCaptor.forClass(Drone.class);
         verify(droneRepository).save(argumentCaptor.capture());
 
         var result = argumentCaptor.getValue();
-        assertEquals(droneDTO.getSerialNumber(), result.getSerialNumber());
-        assertEquals(droneDTO.getModelId(), result.getModelId());
-        assertEquals(droneDTO.getStateId(), result.getStateId());
-        assertEquals(droneDTO.getWeightLimit(), result.getWeightLimit());
-        assertEquals(droneDTO.getBatteryCapacity(), result.getBatteryCapacity());
+        assertEquals(createDroneDTO.getSerialNumber(), result.getSerialNumber());
+        assertEquals(createDroneDTO.getModelId(), result.getModelId());
+        assertEquals(createDroneDTO.getStateId(), result.getStateId());
+        assertEquals(createDroneDTO.getWeightLimit(), result.getWeightLimit());
+        assertEquals(createDroneDTO.getBatteryCapacity(), result.getBatteryCapacity());
     }
 
     @Test

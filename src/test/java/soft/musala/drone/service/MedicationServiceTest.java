@@ -6,7 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import soft.musala.drone.domain.dto.MedicationDTO;
+import soft.musala.drone.domain.dto.CreateMedicationDTO;
 import soft.musala.drone.domain.entity.Drone;
 import soft.musala.drone.domain.entity.Medication;
 import soft.musala.drone.domain.enumeration.DroneState;
@@ -37,15 +37,8 @@ class MedicationServiceTest {
     private MedicationService medicationService;
 
     @Test
-    void medicationsShouldBeReturnedByDroneId() {
-        var droneId = 1L;
-        medicationService.getMedicationByDroneId(droneId);
-        verify(medicationRepository).findAllByDroneId(eq(droneId));
-    }
-
-    @Test
     void medicationShouldBeCreatedWithoutDrone() {
-        var medicationDto = new MedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, null);
+        var medicationDto = new CreateMedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, null);
         var medicationCaptor = ArgumentCaptor.forClass(Medication.class);
         medicationService.createMedication(medicationDto);
         verify(medicationRepository).save(medicationCaptor.capture());
@@ -60,7 +53,7 @@ class MedicationServiceTest {
     @Test
     void createMedicationThrowIllegalArgumentExceptionIfCantLoadDrone() {
         var droneId = 2L;
-        var medicationDto = new MedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, droneId);
+        var medicationDto = new CreateMedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, droneId);
         var drone = mock(Drone.class);
         when(droneService.getDroneById(droneId)).thenReturn(drone);
         when(droneService.isAvailableForLoading(eq(drone), eq(medicationDto.getWeight()))).thenReturn(false);
@@ -72,7 +65,7 @@ class MedicationServiceTest {
     @Test
     void medicationShouldBeCreatedWithDrone() {
         var droneId = 2L;
-        var medicationDto = new MedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, droneId);
+        var medicationDto = new CreateMedicationDTO("Aspirin", 50, "AS-50", new byte[] {22,4,6}, droneId);
         var drone = mock(Drone.class);
         when(droneService.getDroneById(droneId)).thenReturn(drone);
         when(droneService.isAvailableForLoading(eq(drone), eq(medicationDto.getWeight()))).thenReturn(true);

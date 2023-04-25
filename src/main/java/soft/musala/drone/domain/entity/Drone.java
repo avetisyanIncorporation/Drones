@@ -1,7 +1,5 @@
 package soft.musala.drone.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,11 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -22,9 +17,8 @@ import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import soft.musala.drone.domain.dto.DroneDTO;
-import soft.musala.drone.domain.enumeration.DroneModel;
-import soft.musala.drone.domain.enumeration.DroneState;
+import lombok.ToString;
+import soft.musala.drone.domain.dto.CreateDroneDTO;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,6 +36,7 @@ import static soft.musala.drone.domain.constant.Constants.DRONE_SERIAL_NUMBER_MI
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
+@ToString(exclude = "medications")
 @Entity
 @Table(name = "drone")
 public class Drone {
@@ -57,21 +52,11 @@ public class Drone {
     @Column(name = "serial_number", nullable = false, unique = true)
     private String serialNumber;
 
-    @Basic
-    @JsonIgnore
     @Column(name = "model_id", nullable = false)
     private int modelId;
 
-    @Transient
-    private DroneModel model;
-
-    @Basic
-    @JsonIgnore
     @Column(name = "state_id", nullable = false)
     private int stateId;
-
-    @Transient
-    private DroneState state;
 
     @Min(DRONE_MIN_WEIGHT_LIMIT)
     @Max(DRONE_MAX_WEIGHT_LIMIT)
@@ -89,12 +74,12 @@ public class Drone {
     public Drone() {
     }
 
-    public Drone(DroneDTO droneDTO) {
-        this.serialNumber = droneDTO.getSerialNumber();
-        this.modelId = droneDTO.getModelId();
-        this.stateId = droneDTO.getStateId();
-        this.weightLimit = droneDTO.getWeightLimit();
-        this.batteryCapacity = droneDTO.getBatteryCapacity();
+    public Drone(CreateDroneDTO createDroneDTO) {
+        this.serialNumber = createDroneDTO.getSerialNumber();
+        this.modelId = createDroneDTO.getModelId();
+        this.stateId = createDroneDTO.getStateId();
+        this.weightLimit = createDroneDTO.getWeightLimit();
+        this.batteryCapacity = createDroneDTO.getBatteryCapacity();
     }
 
     public Set<Medication> getMedications() {
@@ -102,41 +87,5 @@ public class Drone {
             medications = new HashSet<>();
         }
         return medications;
-    }
-
-    @PostLoad
-    void fillTransients() {
-        if (modelId > 0) {
-            this.model = DroneModel.valueOf(modelId);
-        }
-        if (stateId > 0) {
-            this.state = DroneState.valueOf(stateId);
-        }
-    }
-
-    @PrePersist
-    void fillPersistence() {
-        if (model != null) {
-            this.modelId = model.getId();
-        } else if (modelId > 0) {
-            this.model = DroneModel.valueOf(modelId);
-        }
-        if (state != null) {
-            this.stateId = state.getId();
-        } else if (stateId > 0) {
-            this.state = DroneState.valueOf(stateId);
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Drone{" +
-                "id=" + id +
-                ", serialNumber='" + serialNumber + '\'' +
-                ", model=" + DroneModel.valueOf(modelId) +
-                ", state=" + DroneState.valueOf(stateId) +
-                ", weightLimit=" + weightLimit +
-                ", battery=" + batteryCapacity + "%" +
-                '}';
     }
 }

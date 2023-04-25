@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import soft.musala.drone.domain.dto.MedicationDTO;
+import soft.musala.drone.domain.dto.CreateMedicationDTO;
 import soft.musala.drone.domain.entity.Medication;
 import soft.musala.drone.exception.BusinessException;
 import soft.musala.drone.service.ExceptionService;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(MedicationController.class)
 public class MedicationControllerTest {
 
-    private final String MEDICATIONS_MANAGEMENT_URN = "/medication-management/medications";
+    private final String MEDICATIONS_MANAGEMENT_URN = "/medications";
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,18 +40,18 @@ public class MedicationControllerTest {
 
     @Test
     public void failCreatingMedicationWhenFieldNameIsNotMatchToPattern() throws Exception {
-        var mockExceptionText = "exception in BindingResult";
+        var mockExceptionText = "exception name in BindingResult";
         doThrow(new BusinessException(mockExceptionText)).when(exceptionService).throwBusinessExceptionByFieldsError(any());
 
         mockMvc.perform(post(MEDICATIONS_MANAGEMENT_URN).param("name", Strings.EMPTY))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(mockExceptionText));
+                .andExpect(content().json("{\"status\":400,\"message\":\"exception name in BindingResult\"}"));
     }
 
     @Test
     public void createMedication() throws Exception {
-        var medicationDto = new MedicationDTO("Aspirine", 50, "AS", null, 3L);
+        var medicationDto = new CreateMedicationDTO("Aspirine", 50, "AS", null, 3L);
         var medication = new Medication(medicationDto);
 
         when(medicationService.createMedication(eq(medicationDto))).thenReturn(medication);

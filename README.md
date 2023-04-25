@@ -7,7 +7,7 @@ Database - PostgreSQL, Migrations - Liquibase
 
 
 ## Environment
-For building, running and testing the application you must have:
+For building, running and testing(92% coverage) the application you must have:
 
 0) Git
 1) Java 17 (in project)
@@ -22,7 +22,8 @@ P.s. Auto build (CI/CD) will be soon (You should have only Docker (4))
 2) Go to ```/Drones/``` directory
 3) Set the PostgreSQL ```host:port/database_name, user and password in application.properties``` file
 4) Open ```cmd```
-5) run ```mvn clean package``` - it was init db and built the project (with tests)
+5) run ```mvn clean package``` - it was init db* and built the project (with tests)
+   * If you don't have db, you can build (uses in-memory db), but can't run
 
 For local runnig:
 1) ```mvn spring-boot:run```
@@ -38,16 +39,16 @@ P.s. Soon
 
 @GET
 
-1) For get all available drones use ```/drone-management/drones```
-2) For get current drone battery capacity use ```/drone-management/drones/{drone-id}/battery-capacity/```, where ```drone-id``` is ```drone.id from db```
-3) For get drone medications use ```/drone-management/drones/{drone-id}/medications/```, where ```drone-id``` is ```drone.id from db```
+1) For get all available drones use ```/drones```
+2) For get current drone battery capacity use ```/drones/{drone-id}/battery-capacity```, where ```drone-id``` is ```drone.id from db```
+3) For get drone medications use ```/drones/{drone-id}/medications```, where ```drone-id``` is ```drone.id from db```
 
 @POST
 
-1) For register a new drone use ```/drone-management/drones```
+1) For register a new drone use ```/drones```
    with params: ```serialNumber, modelId, stateId, weightLimit, batteryCapacity```
-2) For create new medication use ```/medication-management/medications```
+2) For create new medication use ```/medications```
    with params: ```name, weight, code, image (non-required), droneId (for add to current drone, non-required)```
-3) For add medication to current drone use ```/drone-management/drones/{drone-id}/medication/{medication-id}/add```
+3) For add medication to current drone use ```/drones/{drone-id}/medications/{medication-id}```
    , where ```drone-id``` is ```drone.id from db``` and ```medication-id``` is ```medication.id from db```
   

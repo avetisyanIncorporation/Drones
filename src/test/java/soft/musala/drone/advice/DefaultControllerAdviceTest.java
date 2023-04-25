@@ -24,7 +24,8 @@ class DefaultControllerAdviceTest {
         var be = new BusinessException(message);
         var result = defaultControllerAdvice.handleBusinessException(be);
         assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
-        assertEquals(message, result.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), result.getBody().getStatus());
+        assertEquals(message, result.getBody().getMessage());
     }
 
     @Test
@@ -33,6 +34,7 @@ class DefaultControllerAdviceTest {
         var iae = new IllegalArgumentException(message);
         var result = defaultControllerAdvice.handleIllegalArgumentException(iae);
         assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
-        assertEquals(message, result.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST.value(), result.getBody().getStatus());
+        assertEquals(message, result.getBody().getMessage());
     }
 }

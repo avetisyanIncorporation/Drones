@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import soft.musala.drone.domain.dto.MedicationDTO;
+import soft.musala.drone.domain.dto.CreateMedicationDTO;
 
 /**
  * @author Pargev A. created on 13.04.2023
@@ -61,10 +61,10 @@ public class Medication {
     public Medication() {
     }
 
-    public Medication(MedicationDTO medicationDTO) {
-        this.name = medicationDTO.getName();
-        this.weight = medicationDTO.getWeight();
-        this.code = medicationDTO.getCode();
-        this.image = medicationDTO.getImage();
+    public Medication(CreateMedicationDTO createMedicationDTO) {
+        this.name = createMedicationDTO.getName();
+        this.weight = createMedicationDTO.getWeight();
+        this.code = createMedicationDTO.getCode();
+        this.image = createMedicationDTO.getImage();
     }
 }

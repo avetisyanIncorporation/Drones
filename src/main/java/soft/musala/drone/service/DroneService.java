@@ -2,7 +2,7 @@ package soft.musala.drone.service;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
-import soft.musala.drone.domain.dto.DroneDTO;
+import soft.musala.drone.domain.dto.CreateDroneDTO;
 import soft.musala.drone.domain.entity.Drone;
 import soft.musala.drone.domain.entity.Medication;
 import soft.musala.drone.domain.repository.DroneRepository;
@@ -13,6 +13,8 @@ import static soft.musala.drone.domain.constant.Constants.AVAILABLE_DRONES_BATTE
 import static soft.musala.drone.domain.constant.Constants.AVAILABLE_DRONE_STATE_IDS;
 
 /**
+ * Drones management service.
+ *
  * @author Pargev A. created on 13.04.2023
  */
 @Service
@@ -46,11 +48,11 @@ public class DroneService {
     /**
      * Add (Register) new drone in db.
      *
-     * @param droneDTO new drone info
+     * @param createDroneDTO new drone info
      * @return saved drone from db
      */
-    public Drone addNewDrone(DroneDTO droneDTO) {
-        return droneRepository.save(new Drone(droneDTO));
+    public Drone addNewDrone(CreateDroneDTO createDroneDTO) {
+        return droneRepository.save(new Drone(createDroneDTO));
     }
 
     /**

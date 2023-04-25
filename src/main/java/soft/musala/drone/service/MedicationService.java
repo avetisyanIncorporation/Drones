@@ -2,15 +2,16 @@ package soft.musala.drone.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import soft.musala.drone.domain.dto.MedicationDTO;
+import soft.musala.drone.domain.dto.CreateMedicationDTO;
 import soft.musala.drone.domain.entity.Medication;
 import soft.musala.drone.domain.enumeration.DroneState;
 import soft.musala.drone.domain.repository.MedicationRepository;
 
 import java.util.Objects;
-import java.util.Set;
 
 /**
+ * Medication management service.
+ *
  * @author Pargev A. created on 13.04.2023
  */
 @Service
@@ -25,29 +26,18 @@ public class MedicationService {
     }
 
     /**
-     * Find all Medications by drone id.
-     *
-     * @param droneId drone id
-     * @return Medications for drone
-     */
-    @Transactional
-    public Set<Medication> getMedicationByDroneId(long droneId) {
-        return medicationRepository.findAllByDroneId(droneId);
-    }
-
-    /**
      * Create new Medication and add to drone.
      *
-     * @param medicationDTO DTO with new Medication info
+     * @param createMedicationDTO DTO with new Medication info
      * @return created Medication
      * @throws IllegalArgumentException When drone doesn't exist or not available for loading
      */
     @Transactional
-    public Medication createMedication(MedicationDTO medicationDTO) {
-        var medication = new Medication(medicationDTO);
-        if (Objects.nonNull(medicationDTO.getDroneId())) {
-            var drone = droneService.getDroneById(medicationDTO.getDroneId());
-            if (droneService.isAvailableForLoading(drone, medicationDTO.getWeight())) {
+    public Medication createMedication(CreateMedicationDTO createMedicationDTO) {
+        var medication = new Medication(createMedicationDTO);
+        if (Objects.nonNull(createMedicationDTO.getDroneId())) {
+            var drone = droneService.getDroneById(createMedicationDTO.getDroneId());
+            if (droneService.isAvailableForLoading(drone, createMedicationDTO.getWeight())) {
                 drone.setStateId(DroneState.LOADING.getId());
                 medication.setDrone(drone);
             } else {

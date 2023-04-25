@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import soft.musala.drone.advice.dto.ApiError;
 import soft.musala.drone.exception.BusinessException;
 
 /**
@@ -21,10 +22,10 @@ public class DefaultControllerAdvice {
      * @return Response entity with exception message
      */
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handleBusinessException(BusinessException businessException) {
+    public ResponseEntity<ApiError> handleBusinessException(BusinessException businessException) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(businessException.getMessage());
+                .body(ApiError.badRequest(businessException.getMessage()));
     }
 
     /**
@@ -34,9 +35,9 @@ public class DefaultControllerAdvice {
      * @return Response entity with exception message
      */
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException illegalArgumentException) {
+    public ResponseEntity<ApiError> handleIllegalArgumentException(IllegalArgumentException illegalArgumentException) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(illegalArgumentException.getMessage());
+                .body(ApiError.badRequest(illegalArgumentException.getMessage()));
     }
 }

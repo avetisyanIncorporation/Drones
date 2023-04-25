@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import soft.musala.drone.domain.dto.CreateDroneDTO;
 import soft.musala.drone.domain.dto.DroneDTO;
-import soft.musala.drone.domain.entity.Drone;
 import soft.musala.drone.service.DroneService;
 import soft.musala.drone.service.ExceptionService;
 import soft.musala.drone.service.MedicationService;
@@ -23,7 +23,7 @@ import java.util.List;
  * @author Pargev A. created on 13.04.2023
  */
 @RestController
-@RequestMapping(value = "drone-management/drones")
+@RequestMapping(value = "drones")
 public class DroneController {
 
     private final DroneService droneService;
@@ -39,36 +39,36 @@ public class DroneController {
     }
 
     @GetMapping
-    public List<Drone> getAvailable() {
-        return droneService.getAllAvailable();
+    public List<DroneDTO> getAvailable() {
+        return DroneDTO.of(droneService.getAllAvailable());
     }
 
     @PostMapping
-    public Drone registerNewDrone(@Valid @ModelAttribute DroneDTO droneDTO, BindingResult result) {
+    public DroneDTO registerNewDrone(@Valid @ModelAttribute CreateDroneDTO createDroneDTO, BindingResult result) {
         if (result.hasErrors()) {
             exceptionService.throwBusinessExceptionByFieldsError(result);
         }
-        return droneService.addNewDrone(droneDTO);
+        return DroneDTO.of(droneService.addNewDrone(createDroneDTO));
     }
 
     @GetMapping(value = "/{drone-id}/battery-capacity")
-    public Integer getDroneBatteryCapacity(@PathVariable("drone-id") Long droneId) {
-        return droneService.getDroneBatteryCapacity(droneId);
+    public DroneDTO getDroneBatteryCapacity(@PathVariable("drone-id") Long droneId) {
+        return DroneDTO.of(droneId, droneService.getDroneBatteryCapacity(droneId));
     }
 
     @GetMapping(value = "/{drone-id}/medications")
-    public Drone getDroneMedications(@PathVariable("drone-id") Long droneId) {
-        return droneService.getDroneById(droneId);
+    public DroneDTO getDroneMedications(@PathVariable("drone-id") Long droneId) {
+        return DroneDTO.of(droneService.getDroneById(droneId));
     }
 
     @Transactional
-    @PostMapping(value = "/{drone-id}/managed-medications/{medication-id}")
-    public Drone addMedicationToDrone(@PathVariable("drone-id") Long droneId,
+    @PostMapping(value = "/{drone-id}/medications/{medication-id}")
+    public DroneDTO addMedicationToDrone(@PathVariable("drone-id") Long droneId,
                                       @PathVariable("medication-id") Long medicationId) {
         var drone = droneService.getDroneById(droneId);
         var medication = medicationService.getMedication(medicationId);
         drone.getMedications().add(medication);
         medication.setDrone(drone);
-        return drone;
+        return DroneDTO.of(drone);
     }
 }
